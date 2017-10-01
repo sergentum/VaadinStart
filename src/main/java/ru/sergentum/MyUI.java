@@ -1,26 +1,38 @@
 package ru.sergentum;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 
+import com.mongodb.*;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.*;
 import com.vaadin.ui.*;
+
+import org.bson.Document;
 import ru.sergentum.parser.ParserCurrency;
 import ru.sergentum.parser.ParserWeather;
 import ru.sergentum.pojo.Currency;
 import ru.sergentum.pojo.Forecast;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
 
 @Theme("mytheme")
 public class MyUI extends UI {
 
-    int counter = 0;
+    static int counter = 0;
     String city = "";
+
+    static MongoDBConnection mongoDBConnection;
 
     @Override
     protected void init(VaadinRequest vaadinRequest) {
+
         HorizontalLayout horizontalLayout = new HorizontalLayout();
 
         VerticalLayout verticalLayoutWeather = new VerticalLayout();
@@ -42,15 +54,11 @@ public class MyUI extends UI {
 //        footerLayout.setComponentAlignment(currentTime, Alignment.BOTTOM_LEFT);
 //        footerLayout.setComponentAlignment(yourIP, Alignment.BOTTOM_RIGHT);
 
-
         horizontalLayout.addComponents(verticalLayoutWeather, verticalLayoutCurrency, verticalLayoutCounter);
-
 
         //---------------------------------
 
 //        System.out.println(localDateTime.toString().replace("T", " "));
-
-
 
         mainLayout.addComponents(mainHeader, horizontalLayout, footerLayout);
 //        mainLayout.setDefaultComponentAlignment(Alignment.TOP_CENTER); //не сработало почему то
@@ -58,6 +66,7 @@ public class MyUI extends UI {
         mainLayout.setComponentAlignment(mainHeader, Alignment.TOP_CENTER);
         mainLayout.setComponentAlignment(horizontalLayout, Alignment.TOP_CENTER);
         mainLayout.setComponentAlignment(footerLayout, Alignment.TOP_CENTER);
+
 
         ///////////////////////////////////////////////////////////////////////
         // Create a selection component with some items
@@ -90,7 +99,6 @@ public class MyUI extends UI {
                         default: city = "";
                     }
                 }
-
         );
 
 
@@ -123,6 +131,7 @@ public class MyUI extends UI {
                     System.out.println("City is not selected");
                 }
 
+                System.out.println(mongoDBConnection.getCounter());
             }
         };
         button1.addClickListener(listener1);
@@ -130,6 +139,7 @@ public class MyUI extends UI {
         verticalLayoutWeather.setComponentAlignment(headerWeather, Alignment.TOP_CENTER);
         //emulate click on load page
         listener1.buttonClick( new Button.ClickEvent( button1 ) );
+
 
         ///////////////////////////////////////////////////////////////////////////////
         Label headerCurrency = new Label("Курсы валют");
@@ -145,6 +155,8 @@ public class MyUI extends UI {
                     eurLabel.setValue("usd: " + currency.getUsd());
                     usdLabel.setValue("eur: " + currency.getEur());
                 } else System.out.println("currency is null");
+
+//                mongoDBConnection.setCounter(135);
             }
         };
         button2.addClickListener(listener2);
@@ -164,13 +176,38 @@ public class MyUI extends UI {
 
 
         ////////////////////////////////////////////////////////////////////////////////
-
-
         setContent(mainLayout);
     }
 
     @WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
     @VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
-    public static class MyUIServlet extends VaadinServlet {
+    public static class MyUIServlet extends VaadinServlet
+            implements SessionInitListener, SessionDestroyListener {
+
+
+            @Override
+            protected void servletInitialized() throws ServletException {
+                super.servletInitialized();
+                getService().addSessionInitListener(this);
+                getService().addSessionDestroyListener(this);
+
+                mongoDBConnection = MongoDBConnection.getInstance();
+                counter = mongoDBConnection.getCounter();
+                System.out.println("servletInitialized: " + counter);
+            }
+
+            @Override
+            public void sessionInit(SessionInitEvent event)
+            throws ServiceException {
+                // Do session start stuff here
+                System.out.println("sessionInit: " + counter);
+                counter++;
+                mongoDBConnection.setCounter(counter);
+            }
+
+            @Override
+            public void sessionDestroy(SessionDestroyEvent event) {
+                // Do session end stuff here
+            }
     }
 }

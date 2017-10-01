@@ -8,6 +8,7 @@ import ru.sergentum.pojo.Currency;
 import ru.sergentum.pojo.Forecast;
 
 public class ParserCurrency {
+
     public Currency getCurrency() {
         Currency result = null;
         String eur = "";
