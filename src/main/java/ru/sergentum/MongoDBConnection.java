@@ -18,7 +18,11 @@ public class MongoDBConnection {
     private MongoDBConnection() {
 
         MongoClientURI uri = new MongoClientURI(
-                "mongodb://admin:QWE123asd@cluster0-shard-00-00-q1k7y.mongodb.net:27017,cluster0-shard-00-01-q1k7y.mongodb.net:27017,cluster0-shard-00-02-q1k7y.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin"
+                "mongodb://admin:QWE123asd@" +
+                        "cluster0-shard-00-00-q1k7y.mongodb.net:27017," +
+                        "cluster0-shard-00-01-q1k7y.mongodb.net:27017," +
+                        "cluster0-shard-00-02-q1k7y.mongodb.net:27017" +
+                        "/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin"
         );
 
         mongoClient = new MongoClient(uri);
@@ -48,12 +52,11 @@ public class MongoDBConnection {
             if (key.equals("int")){
                 try{
                     result = Integer.parseInt(value.toString());
-                    System.out.println("Get count from db: " + result);
+//                    System.out.println("Get count from db: " + result);
                 } catch (Exception ex) {
                     System.err.println("Error while getting counter from db");
                     ex.printStackTrace();
                 }
-
             }
         }
 
@@ -73,9 +76,6 @@ public class MongoDBConnection {
 
         if (cursor.hasNext()){
 
-            BasicDBObject query2 = new BasicDBObject();
-            query.put("name", "counter");
-
             BasicDBObject newDocument = new BasicDBObject();
             newDocument.put("name", "counter");
             newDocument.put("int", counter);
@@ -91,13 +91,6 @@ public class MongoDBConnection {
             document.put("int", counter);
             table.insert(document);
         }
-
-
-        while (cursor.hasNext()) {
-            System.out.println(cursor.next());
-        }
-
-        // search document where name="mkyong" and update it with new values
 
         Counter = counter;
     }

@@ -41,8 +41,6 @@ public class MyUI extends UI {
 
         HorizontalLayout footerLayout = new HorizontalLayout();
 
-//        footerLayout.
-
         VerticalLayout mainLayout = new VerticalLayout();
 
         Label mainHeader = new Label("Тестовое сетевое приложение");
@@ -51,17 +49,12 @@ public class MyUI extends UI {
         Label yourIP = new Label("Ваш IP: " + webBrowser.getAddress());
 
         footerLayout.addComponents(currentTime, yourIP);
-//        footerLayout.setComponentAlignment(currentTime, Alignment.BOTTOM_LEFT);
-//        footerLayout.setComponentAlignment(yourIP, Alignment.BOTTOM_RIGHT);
 
         horizontalLayout.addComponents(verticalLayoutWeather, verticalLayoutCurrency, verticalLayoutCounter);
 
         //---------------------------------
 
-//        System.out.println(localDateTime.toString().replace("T", " "));
-
         mainLayout.addComponents(mainHeader, horizontalLayout, footerLayout);
-//        mainLayout.setDefaultComponentAlignment(Alignment.TOP_CENTER); //не сработало почему то
 
         mainLayout.setComponentAlignment(mainHeader, Alignment.TOP_CENTER);
         mainLayout.setComponentAlignment(horizontalLayout, Alignment.TOP_CENTER);
@@ -131,7 +124,6 @@ public class MyUI extends UI {
                     System.out.println("City is not selected");
                 }
 
-                System.out.println(mongoDBConnection.getCounter());
             }
         };
         button1.addClickListener(listener1);
@@ -155,8 +147,6 @@ public class MyUI extends UI {
                     eurLabel.setValue("usd: " + currency.getUsd());
                     usdLabel.setValue("eur: " + currency.getEur());
                 } else System.out.println("currency is null");
-
-//                mongoDBConnection.setCounter(135);
             }
         };
         button2.addClickListener(listener2);
@@ -193,14 +183,14 @@ public class MyUI extends UI {
 
                 mongoDBConnection = MongoDBConnection.getInstance();
                 counter = mongoDBConnection.getCounter();
-                System.out.println("servletInitialized: " + counter);
+//                System.out.println("servletInitialized: " + counter);
             }
 
             @Override
             public void sessionInit(SessionInitEvent event)
             throws ServiceException {
                 // Do session start stuff here
-                System.out.println("sessionInit: " + counter);
+//                System.out.println("sessionInit: " + counter);
                 counter++;
                 mongoDBConnection.setCounter(counter);
             }
